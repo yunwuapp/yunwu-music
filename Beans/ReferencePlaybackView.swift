@@ -85,20 +85,23 @@ struct ReferencePlaybackView: View {
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
             .overlay(alignment: .topLeading) {
-                Button {
-                    BeansHaptics.tap()
-                    onClose()
-                } label: {
-                    Image(systemName: "chevron.down")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.92))
-                        .frame(width: 38, height: 38)
-                        .background(Color.beansGlassFill.opacity(0.86), in: Circle())
+                if !showLyrics {
+                    Button {
+                        BeansHaptics.tap()
+                        onClose()
+                    } label: {
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(primaryColor.opacity(0.92))
+                            .frame(width: 36, height: 36)
+                            .background(Color.black.opacity(0.22), in: Circle())
+                            .overlay(Circle().strokeBorder(primaryColor.opacity(0.18), lineWidth: 0.6))
+                    }
+                    .buttonStyle(GlassPressButtonStyle())
+                    .padding(.leading, 18)
+                    .padding(.top, 6)
+                    .zIndex(50)
                 }
-                .buttonStyle(GlassPressButtonStyle())
-                .padding(.leading, 16)
-                .padding(.top, 8)
-                .zIndex(50)
             }
         }
         .background {
@@ -307,6 +310,19 @@ struct ReferencePlaybackView: View {
 
     private var lyricsHeader: some View {
         HStack(spacing: 12) {
+            Button {
+                BeansHaptics.tap()
+                onClose()
+            } label: {
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(primaryColor.opacity(0.9))
+                    .frame(width: 30, height: 30)
+                    .background(Color.black.opacity(0.20), in: Circle())
+                    .overlay(Circle().strokeBorder(primaryColor.opacity(0.16), lineWidth: 0.6))
+            }
+            .buttonStyle(GlassPressButtonStyle(scale: 0.92))
+
             Button {
                 BeansHaptics.tap()
                 showLyrics = false

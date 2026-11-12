@@ -26,19 +26,14 @@ struct UpdateChecker {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
     }
 
+    /// 已移除线上更新：启动时不检查，避免联网提示
     static func checkIfNeeded() async -> ReleaseInfo? {
-        guard let info = try? await fetchLatest(), isNewer(info.version, than: currentVersion) else { return nil }
-        if UserDefaults.standard.string(forKey: suppressedVersionKey) == info.version { return nil }
-        return info
+        nil
     }
 
+    /// 手动检查固定提示“已是最新版本”
     static func checkNow() async -> CheckResult {
-        do {
-            let info = try await fetchLatest()
-            return isNewer(info.version, than: currentVersion) ? .update(info) : .upToDate
-        } catch {
-            return .failed
-        }
+        .upToDate
     }
 
     static func suppress(version: String) {

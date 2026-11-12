@@ -232,12 +232,16 @@ struct BeansGlass<S: Shape>: View {
 
     var body: some View {
         if isLiquid {
-            if flatGlass {
-                shape.fill(Color.beansGlassFill.opacity(0.86))
-            } else {
-                shape
-                    .fill(Color.beansGlassFill.opacity(0.86))
-            }
+            shape.fill(
+                LinearGradient(
+                    colors: [
+                        Color.beansGlassFill.opacity(0.96),
+                        Color.beansGlassFill.opacity(0.78)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
         } else {
             switch uiStyle {
             case .clear, .liquid:
