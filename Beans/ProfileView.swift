@@ -997,7 +997,7 @@ struct SettingsView: View {
     @AppStorage("beans.homeGreetingGradientStartHex") private var homeGreetingGradientStartHex = ""
     @AppStorage("beans.homeGreetingGradientEndHex") private var homeGreetingGradientEndHex = ""
     @AppStorage("beans.homeGreetingFont") private var homeGreetingFontName = ""
-    @AppStorage("beans.liveActivity.enabled") private var liveActivityEnabled = true
+    @AppStorage("beans.liveActivity.enabled") private var liveActivityEnabled = false
     @AppStorage("beans.pauseHomeRendering") private var homeRenderingPaused = false
     @AppStorage("beans.homeHideUsername") private var homeHideUsername = false
     @AppStorage("beans.homeHeaderHideSort") private var homeHeaderHideSort = false

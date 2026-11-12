@@ -40,7 +40,9 @@ struct BeansApp: App {
             "beans.homeWallpaperBlur": 0.0,
             "beans.haptics.enabled": true,
             "beans.playback.autoResumeLast": false,
-            "beans.playback.autoSkipOnFailure": true
+            "beans.playback.autoSkipOnFailure": true,
+            // 灵动岛/锁屏实时活动默认关闭：它由系统托管，强杀 App 后无法立刻撤下
+            "beans.liveActivity.enabled": false
         ])
     }
 
