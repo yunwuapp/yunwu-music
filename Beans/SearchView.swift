@@ -254,8 +254,9 @@ struct SearchView: View {
             VStack(spacing: 0) {
                 typeTabs
                 resultsArea
+                Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
     }
 
