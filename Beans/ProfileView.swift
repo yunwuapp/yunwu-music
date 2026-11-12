@@ -68,7 +68,7 @@ struct ProfileView: View {
 
     private var appVersionText: String {
         let ver = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.2"
-        return "云雾 · \(ver)"
+        return "错拍 · \(ver)"
     }
 
     /// 登录状态的合并提示（展示各平台真实昵称）
@@ -2522,7 +2522,7 @@ struct SettingsView: View {
         }
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
         payload["beans.backup.meta"] = [
-            "app": "云雾",
+            "app": "错拍",
             "created": ISO8601DateFormatter().string(from: Date()),
             "version": version,
             "includedAccounts": includeAccounts,
@@ -2765,7 +2765,7 @@ struct SettingsView: View {
 
     private var footerNote: some View {
         VStack(spacing: 6) {
-            Text("云雾 · 仅供学习交流，纯 AI 实现此应用")
+            Text("错拍 · 仅供学习交流，纯 AI 实现此应用")
                 .font(BeansFont.appFont(11))
                 .foregroundStyle(Color.beansComment.opacity(0.7))
             Text("接入网易云音乐、QQ 音乐等公开接口")

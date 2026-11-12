@@ -54,7 +54,7 @@ final class BeansLogger: ObservableObject {
     }()
 
     private init() {
-        log("云雾 启动（版本 \(Self.appVersion)）", level: .info)
+        log("错拍 启动（版本 \(Self.appVersion)）", level: .info)
     }
 
     static var appVersion: String {

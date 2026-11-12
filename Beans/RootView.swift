@@ -696,7 +696,7 @@ private struct UpdatePromptOverlay: View {
                         Text("发现新版本")
                             .font(BeansFont.appFont(20, .bold))
                             .foregroundStyle(Color.beansLabel)
-                        Text("云雾 \(info.version)")
+                        Text("错拍 \(info.version)")
                             .font(BeansFont.appFont(13, .semibold))
                             .foregroundStyle(Color.beansAmber)
                     }

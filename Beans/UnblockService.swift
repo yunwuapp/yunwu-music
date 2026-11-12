@@ -334,7 +334,7 @@ enum UnblockService {
         var request = URLRequest(url: url)
         request.timeoutInterval = 7
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("YunWu-UserSource/1.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("CuoPai-UserSource/1.0", forHTTPHeaderField: "User-Agent")
         if let apiKey, !apiKey.isEmpty {
             request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
         }
