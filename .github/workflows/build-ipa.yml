@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, macos-26, macos-15-intel]
+        os: [macos-15-intel, macos-15, macos-26]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -24,13 +24,16 @@ jobs:
 
       - name: Build unsigned
         run: |
-          set -o pipefail
+          set +e
           xcodebuild -project Beans.xcodeproj -scheme Beans \
             -configuration Release -sdk iphoneos \
             -destination 'generic/platform=iOS' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
-            build 2>&1 | tail -80
+            build > build.log 2>&1
+          code=$?
+          grep -E "error:|BUILD (SUCCEEDED|FAILED)" build.log | tail -40
+          exit $code
 
       - name: Package IPA
         run: |
@@ -39,8 +42,15 @@ jobs:
           zip -qry YunWu.ipa Payload
           ls -lh YunWu.ipa
 
-      - name: Upload
+      - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
           name: YunWu-ipa-${{ matrix.os }}
           path: YunWu.ipa
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: buildlog-${{ matrix.os }}
+          path: build.log

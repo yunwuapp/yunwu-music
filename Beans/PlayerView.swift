@@ -2308,21 +2308,9 @@ struct PlayerView: View {
             .frame(width: size, height: size)
         case .appleMusic:
             if appleLiquid {
-                if #available(iOS 26, *) {
-                    GlassEffectContainer {
-                        Circle()
-                            .fill(.clear)
-                            .glassEffect(
-                                primary ? .regular.tint(.white.opacity(0.96)) : .regular,
-                                in: Circle()
-                            )
-                    }
+                Circle()
+                    .fill(.ultraThinMaterial)
                     .frame(width: size, height: size)
-                } else {
-                    Circle()
-                        .fill(.ultraThinMaterial)
-                        .frame(width: size, height: size)
-                }
             } else {
                 Color.clear
                     .frame(width: size, height: size)
@@ -4673,14 +4661,7 @@ private struct PlayerSettingsLiquidGlass<S: Shape>: View {
     }
 
     var body: some View {
-        if #available(iOS 26, *), uiStyle == .liquid {
-            GlassEffectContainer {
-                shape
-                    .fill(.clear)
-                    .glassEffect(.clear, in: shape)
-            }
-        } else {
-            switch uiStyle {
+        switch uiStyle {
             case .clear, .liquid:
                 shape.fill(.ultraThinMaterial)
             case .compact:
@@ -4688,9 +4669,7 @@ private struct PlayerSettingsLiquidGlass<S: Shape>: View {
             case .nativeClean:
                 shape.fill(Color.primary.opacity(0.038))
             }
-        }
     }
-
 }
 
 // MARK: - 下载文件分享（Identifiable 包装，供 sheet(item:) 使用）

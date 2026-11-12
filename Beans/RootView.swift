@@ -518,20 +518,7 @@ private struct MiniPlayerAccessoryModifier: ViewModifier {
 
     @ViewBuilder
     func body(content: Content) -> some View {
-        if isActive {
-            content.tabViewBottomAccessory {
-                MiniPlayerView(
-                    showPlayer: $showPlayer,
-                    presentation: .accessory,
-                    transitionNamespace: transitionNamespace
-                )
-                    .padding(.horizontal, 12)
-                    .environmentObject(clock)
-                    .environment(\.colorScheme, colorScheme)
-            }
-        } else {
-            content
-        }
+        content
     }
 }
 
