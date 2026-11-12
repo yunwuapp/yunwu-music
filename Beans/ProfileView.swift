@@ -1456,9 +1456,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             Button {
                 BeansHaptics.select()
-                withAnimation(.easeInOut(duration: 0.22)) {
-                    platformExpanded.toggle()
-                }
+                platformExpanded.toggle()
             } label: {
                 HStack(spacing: 12) {
                     Image(systemName: "checklist")
@@ -1501,9 +1499,7 @@ struct SettingsView: View {
             // 外观设置行：点击展开 / 收起全部外观设置
             Button {
                 BeansHaptics.select()
-                withAnimation(.easeInOut(duration: 0.25)) {
-                    appearanceExpanded.toggle()
-                }
+                appearanceExpanded.toggle()
             } label: {
                 HStack(spacing: 12) {
                     Image(systemName: "paintpalette.fill")
@@ -2157,9 +2153,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             Button {
                 BeansHaptics.select()
-                withAnimation(.easeInOut(duration: 0.22)) {
-                    playbackExpanded.toggle()
-                }
+                playbackExpanded.toggle()
             } label: {
                 HStack(spacing: 12) {
                     Image(systemName: "play.circle.fill")
@@ -2418,9 +2412,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             Button {
                 BeansHaptics.select()
-                withAnimation(.easeInOut(duration: 0.22)) {
-                    backupExpanded.toggle()
-                }
+                backupExpanded.toggle()
             } label: {
                 HStack(spacing: 12) {
                     Image(systemName: "externaldrive.fill")

@@ -37,12 +37,12 @@ final class HighRefreshKeeper {
     private func start() {
         guard displayLink == nil else { return }
         let link = CADisplayLink(target: self, selector: #selector(tick))
-        // 强制请求 120 帧：ProMotion 机型直接跑满 120Hz，60Hz 机型由系统自动钳制。
-        let target: Float = 120
+        // 最高 120 帧、负载自适应：重毛玻璃页面负载升高时可自动降到 80/60，
+        // 避免为了锁 120 而持续丢帧（锁死 120 在设置页会明显卡顿）。
         link.preferredFrameRateRange = CAFrameRateRange(
-            minimum: target,
-            maximum: target,
-            preferred: target
+            minimum: 60,
+            maximum: 120,
+            preferred: 120
         )
         link.add(to: .main, forMode: .common)
         displayLink = link
