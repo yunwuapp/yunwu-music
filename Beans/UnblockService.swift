@@ -15,6 +15,16 @@ enum UnblockService {
         }
     }
 
+    /// 最近一次解析失败原因，用于直接展示给用户，而不是只埋在日志里
+    private(set) static var lastDiagnostics: [String] = []
+
+    static func resetDiagnostics() { lastDiagnostics.removeAll() }
+
+    static func noteDiagnostic(_ text: String) {
+        lastDiagnostics.append(text)
+        if lastDiagnostics.count > 8 { lastDiagnostics.removeFirst() }
+    }
+
     private static let session: URLSession = {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 7
@@ -39,6 +49,7 @@ enum UnblockService {
         let hasSongIdentity = !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             || !artists.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         guard hasSongIdentity else { return nil }
+        resetDiagnostics()
         let sources = UnblockSourceStore.shared.sources
             .filter { source in
                 guard source.enabled else { return false }
@@ -48,8 +59,9 @@ enum UnblockService {
         guard !sources.isEmpty else {
             BeansLogger.shared.log(
                 "没有启用的自定义音源：平台=\(songSource.rawValue)",
-                level: .debug
+                level: .info
             )
+            noteDiagnostic("没有启用的自定义音源")
             return nil
         }
 
@@ -117,7 +129,8 @@ enum UnblockService {
                             excludedHosts: excludedHosts
                         )
                     }
-                    BeansLogger.shared.log("自定义音源「\(source.name)」\(result == nil ? "未命中" : "命中")：\(name) - \(artists) 平台=\(songSource.rawValue)", level: result == nil ? .debug : .info)
+                    BeansLogger.shared.log("自定义音源「\(source.name)」\(result == nil ? "未命中" : "命中")：\(name) - \(artists) 平台=\(songSource.rawValue)", level: .info)
+                    if result == nil { noteDiagnostic("「\(source.name)」未命中") }
                     return result
                 }
             }
@@ -186,8 +199,9 @@ enum UnblockService {
         if requiresAPIKey && apiKeys.isEmpty {
             BeansLogger.shared.log(
                 "自定义音源缺少请求密钥：\(source.name)，已跳过请求",
-                level: .debug
+                level: .info
             )
+            noteDiagnostic("「\(source.name)」缺少 API Key")
             return nil
         }
         for (idIndex, songID) in songIDs.enumerated() {
@@ -355,28 +369,33 @@ enum UnblockService {
         do {
             (data, response) = try await session.data(for: request)
         } catch {
-            BeansLogger.shared.log("第三方音源请求失败：\(source.name)\(keyLabel) \(error.localizedDescription)", level: .debug)
+            BeansLogger.shared.log("第三方音源请求失败：\(source.name)\(keyLabel) \(error.localizedDescription)", level: .info)
+            noteDiagnostic("「\(source.name)」请求失败 \(error.localizedDescription)")
             return nil
         }
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             let status = (response as? HTTPURLResponse)?.statusCode ?? -1
-            BeansLogger.shared.log("第三方音源 HTTP 失败：\(source.name)\(keyLabel) 状态=\(status)", level: .debug)
+            BeansLogger.shared.log("第三方音源 HTTP 失败：\(source.name)\(keyLabel) 状态=\(status)", level: .info)
+            noteDiagnostic("「\(source.name)」HTTP \(status)")
             return nil
         }
         guard let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            BeansLogger.shared.log("第三方音源响应格式错误：\(source.name)\(keyLabel)", level: .debug)
+            BeansLogger.shared.log("第三方音源响应格式错误：\(source.name)\(keyLabel)", level: .info)
+            noteDiagnostic("「\(source.name)」返回不是 JSON")
             return nil
         }
         if let code = responseCode(from: obj), code != 0 && code != 200 {
             let message = obj["message"] as? String ?? obj["msg"] as? String ?? "code=\(code)"
-            BeansLogger.shared.log("第三方音源返回失败：\(source.name)\(keyLabel) \(message)", level: .debug)
+            BeansLogger.shared.log("第三方音源返回失败：\(source.name)\(keyLabel) \(message)", level: .info)
+            noteDiagnostic("「\(source.name)」接口报错 \(message)")
             return nil
         }
         guard let value = valueAtAnyPath(obj, source.urlPath),
               let resolvedURL = value as? String, !resolvedURL.isEmpty,
               let rawPlayURL = URL(string: resolvedURL),
               let playURL = playablePlaybackURL(from: rawPlayURL, source: source, keyLabel: keyLabel, excludedHosts: excludedHosts) else {
-            BeansLogger.shared.log("第三方音源响应中没有播放地址：\(source.name)\(keyLabel)", level: .debug)
+            BeansLogger.shared.log("第三方音源响应中没有播放地址：\(source.name)\(keyLabel)", level: .info)
+            noteDiagnostic("「\(source.name)」返回里没有播放地址")
             return nil
         }
         if rawPlayURL != playURL {

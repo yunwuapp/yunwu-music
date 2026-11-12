@@ -556,19 +556,20 @@ final class PlayerManager: NSObject, ObservableObject {
                     self.isBuffering = false
                     self.loadFailed = true
                     let hasCustomSources = UnblockSourceStore.shared.sources.contains(where: \.enabled)
+                    let detail = UnblockService.lastDiagnostics.suffix(2).joined(separator: "；")
                     let failureMessage = hasCustomSources
                         ? beansLocalized(
-                            "播放失败：已启用的自定义音源没有返回可播地址（可能不支持该平台/脚本报错），可在「设置 → 日志」查看原因",
-                            "Playback failed: enabled custom sources returned no playable URL. Check Settings → Logs."
+                            "自定义音源未返回地址：\(detail.isEmpty ? "未命中" : detail)",
+                            "Custom sources returned no playable URL: \(detail.isEmpty ? "no hit" : detail)"
                         )
                         : beansLocalized(
-                            "播放失败，当前音源暂时无法响应，请稍后重试或切换其他歌曲",
-                            "Playback failed. The current source did not respond. Please try again or switch songs."
+                            "官方接口没有返回播放地址",
+                            "The official API returned no playable URL."
                         )
                     BeansLogger.shared.log("播放失败：\(song.name) - \(failureMessage)｜音质=\(quality.level)", level: .error)
                     self.finishUnrecoverablePlaybackFailure(
                         song: song,
-                        reason: "解析播放地址失败",
+                        reason: hasCustomSources ? "自定义音源未命中" : "官方无地址",
                         message: failureMessage
                     )
                 }
@@ -1002,6 +1003,16 @@ final class PlayerManager: NSObject, ObservableObject {
                 "AVURLAssetHTTPHeaderFieldsKey": playbackHeaders
             ])
             item = AVPlayerItem(asset: asset)
+        } else if isThirdParty, let host = url.host, !host.isEmpty {
+            // 第三方音源常见的 403：CDN 校验 UA/Referer，缺了会先起播再报 -11849
+            playbackHeaders = [
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
+                "Referer": "\(url.scheme ?? "https")://\(host)/"
+            ]
+            let asset = AVURLAsset(url: url, options: [
+                "AVURLAssetHTTPHeaderFieldsKey": playbackHeaders
+            ])
+            item = AVPlayerItem(asset: asset)
         } else {
             item = AVPlayerItem(url: url)
         }
@@ -1194,8 +1205,8 @@ final class PlayerManager: NSObject, ObservableObject {
         let failureMessage: String
         if shouldAutoSkip && queue.count > 1 {
             failureMessage = beansLocalized(
-                "播放失败，10秒后自动切换到下一首",
-                "Playback failed. The next song will start in 10 seconds."
+                "播放失败（\(reason)）· 10秒后切下一首",
+                "Playback failed (\(reason)). Next song in 10 seconds."
             )
         } else {
             failureMessage = message ?? beansLocalized(
