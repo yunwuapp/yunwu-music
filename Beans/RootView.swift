@@ -78,7 +78,7 @@ struct RootView: View {
     }
 
     private var usesSystemPlayerDismissal: Bool {
-        if #available(iOS 18.0, *) { return true }
+        // fullScreenCover 不提供系统下拉关闭，统一走自绘手势，避免 iOS 18+ 页面无法退出
         return false
     }
 

@@ -31,6 +31,7 @@ struct ReferencePlaybackView: View {
     let onAddToLocalPlaylist: () -> Void
     let onDownload: () -> Void
     let onPlayerSettings: () -> Void
+    let onClose: () -> Void
 
     @AppStorage("beans.lyricOffset") private var lyricOffset = 0.0
     @AppStorage("beans.appleMusic.showVolume") private var showVolumeControl = false
@@ -83,6 +84,22 @@ struct ReferencePlaybackView: View {
                 }
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
+            .overlay(alignment: .topLeading) {
+                Button {
+                    BeansHaptics.tap()
+                    onClose()
+                } label: {
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.92))
+                        .frame(width: 38, height: 38)
+                        .background(.ultraThinMaterial.opacity(0.5), in: Circle())
+                }
+                .buttonStyle(GlassPressButtonStyle())
+                .padding(.leading, 16)
+                .padding(.top, 8)
+                .zIndex(50)
+            }
         }
         .background {
             HighRefreshConfigurator()

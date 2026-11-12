@@ -400,6 +400,9 @@ struct PlayerView: View {
                         },
                         onPlayerSettings: {
                             openPlayerSettings()
+                        },
+                        onClose: {
+                            closePlayer()
                         }
                     )
 
