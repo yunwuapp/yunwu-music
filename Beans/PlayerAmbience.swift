@@ -15,7 +15,7 @@ struct AmbientGlowView: View {
     var breath: Double = 0.6
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !isPlaying || dustMode != .snow)) { timeline in
+        TimelineView(.animation(minimumInterval: 1.0 / 120.0, paused: !isPlaying || dustMode != .snow)) { timeline in
             Canvas { context, size in
                 guard size.width > 0, size.height > 0 else { return }
                 let t = dustMode == .snow ? timeline.date.timeIntervalSinceReferenceDate : 1.7

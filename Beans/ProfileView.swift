@@ -40,8 +40,6 @@ struct ProfileView: View {
     @State private var updateShareFile: ShareFileItem?
     @State private var updateShareFileURL: URL?
     @State private var didRefreshProfileAccount = false
-    @State private var donationExpanded = false
-    @State private var showWeChatOpenError = false
     @ObservedObject private var qqAuth = QQMusicAuth.shared
     @ObservedObject private var kugouAuth = KugouMusicAuth.shared
     @ObservedObject private var platformPrefs = PlatformPreferenceStore.shared
@@ -190,7 +188,6 @@ struct ProfileView: View {
                     // 更新入口固定放在“我的”页面最底部，避免被板块排序隐藏。
                     updateLinkCard
                     communityCard
-                    donationCard
                     profileVersionFooter
                 }
                 .padding(.horizontal, isNativeClean ? 24 : 16)
@@ -213,11 +210,6 @@ struct ProfileView: View {
             HighRefreshConfigurator()
                 .frame(width: 0, height: 0)
                 .allowsHitTesting(false)
-        }
-        .alert("无法打开微信", isPresented: $showWeChatOpenError) {
-            Button("知道了", role: .cancel) {}
-        } message: {
-            Text("请使用微信扫描上方二维码完成赞助。")
         }
         .sheet(isPresented: $showHistory) {
             HistoryView()
@@ -652,7 +644,7 @@ struct ProfileView: View {
     private var communityCard: some View {
         Button {
             BeansHaptics.tap()
-            if let url = URL(string: "https://t.me/+k8oYhsIU4sgzOTM1") {
+            if let url = URL(string: "https://t.me/yunwu688") {
                 UIApplication.shared.open(url)
             }
         } label: {
@@ -692,133 +684,6 @@ struct ProfileView: View {
             .padding(.top, 2)
     }
 
-    /// 我的页底部赞助入口与赞助排行榜
-    private var donationCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Button {
-                withAnimation(.spring(response: 0.32, dampingFraction: 0.86)) {
-                    donationExpanded.toggle()
-                }
-            } label: {
-                HStack(spacing: 10) {
-                    Image(systemName: "heart.circle.fill")
-                        .font(.system(size: 22))
-                        .foregroundStyle(Color.beansAmber)
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("自愿赞助")
-                            .font(BeansFont.appFont(16, .bold))
-                            .foregroundStyle(Color.beansLabel)
-                        Text(donationExpanded ? "点击收起赞助信息" : "点击展开赞助信息")
-                            .font(BeansFont.appFont(11))
-                            .foregroundStyle(Color.beansComment)
-                    }
-                    Spacer()
-                    Image(systemName: donationExpanded ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(Color.beansComment)
-                }
-            }
-            .buttonStyle(.plain)
-
-            if donationExpanded {
-                Image("DonationQR")
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: 300)
-                .frame(maxWidth: .infinity)
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .strokeBorder(Color.beansComment.opacity(0.14), lineWidth: 0.8)
-                }
-
-                Button {
-                    openWeChatPayment()
-                } label: {
-                    Label("打开微信", systemImage: "arrow.up.forward.app")
-                        .font(BeansFont.appFont(13, .semibold))
-                        .foregroundStyle(Color.beansAmber)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 11)
-                        .background(Color.beansAmber.opacity(0.12), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                }
-                .buttonStyle(GlassPressButtonStyle(scale: 0.98))
-
-                VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Text("赞助人员")
-                        .font(BeansFont.appFont(15, .semibold))
-                        .foregroundStyle(Color.beansLabel)
-                    Spacer()
-                    Text("按金额排序")
-                        .font(BeansFont.appFont(11))
-                        .foregroundStyle(Color.beansComment)
-                }
-
-                ForEach(displayedDonors.indices, id: \.self) { index in
-                    let donor = displayedDonors[index]
-                    HStack(spacing: 10) {
-                        Text("\(index + 1)")
-                            .font(BeansFont.appFont(13, .bold))
-                            .foregroundStyle(index == 0 ? Color.beansAmber : Color.beansComment)
-                            .frame(width: 24, height: 24)
-                            .background(
-                                (index == 0 ? Color.beansAmber : Color.beansComment).opacity(index == 0 ? 0.16 : 0.08),
-                                in: Circle()
-                            )
-                        Text(donor.name)
-                            .font(BeansFont.appFont(13, .medium))
-                            .foregroundStyle(Color.beansLabel)
-                        Spacer()
-                        Text(String(format: "¥ %.2f", donor.amount))
-                            .font(BeansFont.appFont(13, .semibold))
-                            .foregroundStyle(index == 0 ? Color.beansAmber : Color.beansLabel)
-                    }
-                    if index < displayedDonors.count - 1 {
-                        Divider().overlay(Color.beansComment.opacity(0.12))
-                    }
-                }
-                }
-            }
-        }
-        .padding(16)
-        .background {
-            BeansGlass(shape: RoundedRectangle(cornerRadius: 22, style: .continuous))
-        }
-        .beansCardShadow(radius: 9, y: 3)
-    }
-
-    private func openWeChatPayment() {
-        guard let paymentURL = URL(string: "wxp://f2f03Cvy7dWnLLRbIhQJqY-MxVACiIS4JBNSui8VmUk3_Qg") else {
-            showWeChatOpenError = true
-            return
-        }
-
-        UIApplication.shared.open(paymentURL, options: [:]) { opened in
-            guard !opened, let weChatURL = URL(string: "weixin://") else { return }
-            UIApplication.shared.open(weChatURL, options: [:]) { openedWeChat in
-                if !openedWeChat {
-                    showWeChatOpenError = true
-                }
-            }
-        }
-    }
-
-    private var displayedDonors: [Donor] {
-        Self.donors
-    }
-
-    private struct Donor {
-        let name: String
-        let amount: Double
-    }
-
-    private static let donors: [Donor] = [
-        Donor(name: "WeChat", amount: 26.66),
-        Donor(name: "Aert", amount: 8.88),
-        Donor(name: "wxx", amount: 5),
-        Donor(name: "！", amount: 3),
-    ]
 }
 
 // MARK: - 交流群二维码

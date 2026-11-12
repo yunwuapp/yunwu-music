@@ -37,16 +37,13 @@ final class HighRefreshKeeper {
     private func start() {
         guard displayLink == nil else { return }
         let link = CADisplayLink(target: self, selector: #selector(tick))
-        if #available(iOS 15.0, *) {
-            let maximum = Float(min(120, max(60, UIScreen.main.maximumFramesPerSecond)))
-            link.preferredFrameRateRange = CAFrameRateRange(
-                minimum: maximum >= 120 ? 120 : maximum,
-                maximum: maximum,
-                preferred: maximum
-            )
-        } else {
-            link.preferredFramesPerSecond = 120
-        }
+        // 强制请求 120 帧：ProMotion 机型直接跑满 120Hz，60Hz 机型由系统自动钳制。
+        let target: Float = 120
+        link.preferredFrameRateRange = CAFrameRateRange(
+            minimum: target,
+            maximum: target,
+            preferred: target
+        )
         link.add(to: .main, forMode: .common)
         displayLink = link
     }
