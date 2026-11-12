@@ -57,6 +57,10 @@ struct BeansApp: App {
                 FontManager.reinstallIfNeeded()
                 theme.restoreWallpapersIfNeeded()
             }
+            .onOpenURL { url in
+                guard url.scheme == "yunwu" else { return }
+                NotificationCenter.default.post(name: .beansOpenPlayerRequested, object: nil)
+            }
             .onChange(of: scenePhase) { phase in
                 guard phase == .active else { return }
             }

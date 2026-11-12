@@ -1626,7 +1626,13 @@ final class PlayerManager: NSObject, ObservableObject {
     // MARK: - 系统正在播放
 
     private func updateNowPlaying() {
-        guard let song = currentSong else { return }
+        guard let song = currentSong else {
+            if #available(iOS 16.1, *) { PlaybackLiveActivity.end() }
+            return
+        }
+        if #available(iOS 16.1, *) {
+            PlaybackLiveActivity.sync(song: song, isPlaying: isPlaying, progress: progress, duration: max(duration, song.duration))
+        }
         var info: [String: Any] = [
             MPMediaItemPropertyTitle: song.name,
             MPMediaItemPropertyArtist: song.artists,

@@ -136,6 +136,9 @@ struct RootView: View {
         .confirmationDialog("主页平台", isPresented: $showHomePlatformMenu, titleVisibility: .visible) {
             platformSelectionMenu
         }
+        .onReceive(NotificationCenter.default.publisher(for: .beansOpenPlayerRequested)) { _ in
+            showPlayer = true
+        }
         .fullScreenCover(isPresented: $showPlayer) {
             if #available(iOS 18.0, *) {
                 playerPresentation

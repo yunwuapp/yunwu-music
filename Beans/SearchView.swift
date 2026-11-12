@@ -250,13 +250,17 @@ struct SearchView: View {
     private var contentArea: some View {
         if keyword.isEmpty {
             hotSection
+                .simultaneousGesture(TapGesture().onEnded { searchController.dismissKeyboard() })
         } else {
             VStack(spacing: 0) {
                 typeTabs
                 resultsArea
                 Spacer(minLength: 0)
+                                .contentShape(Rectangle())
+                                .onTapGesture { searchController.dismissKeyboard() }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .simultaneousGesture(TapGesture().onEnded { searchController.dismissKeyboard() })
         }
     }
 
