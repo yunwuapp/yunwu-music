@@ -89,8 +89,22 @@ enum UnblockService {
         return await withTaskGroup(of: Resolved?.self) { group in
             for source in uniqueSources {
                 group.addTask {
+                    let result: Resolved?
                     if isScriptSource(source) {
-                        return await scriptSourceRequest(
+                        result = await scriptSourceRequest(
+                            source: source,
+                            name: name,
+                            artists: artists,
+                            neteaseID: neteaseID,
+                            songSource: songSource,
+                            qqMid: qqMid,
+                            qqMediaMid: qqMediaMid,
+                            kugouID: kugouID,
+                            preferredQuality: quality,
+                            excludedHosts: excludedHosts
+                        )
+                    } else {
+                        result = await presetSourceRequest(
                             source: source,
                             name: name,
                             artists: artists,
@@ -103,18 +117,8 @@ enum UnblockService {
                             excludedHosts: excludedHosts
                         )
                     }
-                    return await presetSourceRequest(
-                        source: source,
-                        name: name,
-                        artists: artists,
-                        neteaseID: neteaseID,
-                        songSource: songSource,
-                        qqMid: qqMid,
-                        qqMediaMid: qqMediaMid,
-                        kugouID: kugouID,
-                        preferredQuality: quality,
-                        excludedHosts: excludedHosts
-                    )
+                    BeansLogger.shared.log("自定义音源「\(source.name)」\(result == nil ? "未命中" : "命中")：\(name) - \(artists) 平台=\(songSource.rawValue)", level: result == nil ? .debug : .info)
+                    return result
                 }
             }
             for await result in group {

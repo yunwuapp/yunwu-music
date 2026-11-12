@@ -555,10 +555,16 @@ final class PlayerManager: NSObject, ObservableObject {
                     guard generation == self.loadGeneration else { return }
                     self.isBuffering = false
                     self.loadFailed = true
-                    let failureMessage = beansLocalized(
-                        "播放失败，当前音源暂时无法响应，请稍后重试或切换其他歌曲",
-                        "Playback failed. The current source did not respond. Please try again or switch songs."
-                    )
+                    let hasCustomSources = UnblockSourceStore.shared.sources.contains(where: \.enabled)
+                    let failureMessage = hasCustomSources
+                        ? beansLocalized(
+                            "播放失败：已启用的自定义音源没有返回可播地址（可能不支持该平台/脚本报错），可在「设置 → 日志」查看原因",
+                            "Playback failed: enabled custom sources returned no playable URL. Check Settings → Logs."
+                        )
+                        : beansLocalized(
+                            "播放失败，当前音源暂时无法响应，请稍后重试或切换其他歌曲",
+                            "Playback failed. The current source did not respond. Please try again or switch songs."
+                        )
                     BeansLogger.shared.log("播放失败：\(song.name) - \(failureMessage)｜音质=\(quality.level)", level: .error)
                     self.finishUnrecoverablePlaybackFailure(
                         song: song,
