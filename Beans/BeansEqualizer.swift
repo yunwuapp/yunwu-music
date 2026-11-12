@@ -253,17 +253,18 @@ final class BeansEqualizer: ObservableObject {
             unprepare: equalizerTapUnprepare,
             process: equalizerTapProcess
         )
-        var tap: MTAudioProcessingTap?
+        var tapRef: Unmanaged<MTAudioProcessingTap>?
         let status = MTAudioProcessingTapCreate(
             kCFAllocatorDefault,
             &callbacks,
             kMTAudioProcessingTapCreationFlag_PostEffects,
-            &tap
+            &tapRef
         )
-        guard status == noErr, let tap else {
+        guard status == noErr, let tapBox = tapRef else {
             BeansLogger.shared.log("均衡器音频处理器创建失败：\(status)", level: .error)
             return nil
         }
+        let tap = tapBox.takeUnretainedValue()
 
         let parameters = AVMutableAudioMixInputParameters(track: track)
         parameters.audioTapProcessor = tap
