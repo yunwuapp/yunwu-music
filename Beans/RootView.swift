@@ -572,7 +572,7 @@ private struct KumoneGlassTabBar: View {
         }
         .frame(height: contentHeight)
         .padding(innerInset)
-        .background { Capsule().fill(.regularMaterial) }
+        .background { Capsule().fill(Color.beansGlassFill.opacity(0.92)) }
         .overlay {
             Capsule()
                 .strokeBorder(.white.opacity(colorScheme == .dark ? 0.08 : 0.20), lineWidth: 0.5)
@@ -828,8 +828,8 @@ struct TabBarAppearanceConfigurator: UIViewControllerRepresentable {
         }
         let appearance = UITabBarAppearance()
         appearance.configureWithTransparentBackground()
-        // 超薄材质模糊：与迷你播放器一致的清透玻璃透明度
-        appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterial)
+        // 不再叠加系统实时模糊，改用透明底：省掉一层全屏模糊采样，提升稳定帧率
+        appearance.backgroundEffect = nil
         appearance.backgroundColor = .clear
         appearance.shadowColor = .clear
         tabBar.standardAppearance = appearance

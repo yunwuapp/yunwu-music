@@ -236,13 +236,13 @@ struct BeansGlass<S: Shape>: View {
                 shape.fill(Color.beansGlassFill.opacity(0.86))
             } else {
                 shape
-                    .fill(.ultraThinMaterial)
+                    .fill(Color.beansGlassFill.opacity(0.86))
             }
         } else {
             switch uiStyle {
             case .clear, .liquid:
                 shape
-                    .fill(.ultraThinMaterial)
+                    .fill(Color.beansGlassFill.opacity(0.86))
             case .compact:
                 shape
                     .fill(Color.beansGlassFill.opacity(0.74))
@@ -301,7 +301,7 @@ struct GlassCard<Content: View>: View {
         if isLiquid {
             content()
                 .padding(resolvedPadding)
-                .background(RoundedRectangle(cornerRadius: resolvedCornerRadius, style: .continuous).fill(.ultraThinMaterial))
+                .background(RoundedRectangle(cornerRadius: resolvedCornerRadius, style: .continuous).fill(Color.beansGlassFill.opacity(0.86)))
                 .clipShape(RoundedRectangle(cornerRadius: resolvedCornerRadius, style: .continuous))
                 .beansCardShadow(radius: 9, y: 3)
         } else {
@@ -310,7 +310,7 @@ struct GlassCard<Content: View>: View {
                 .background {
                     RoundedRectangle(cornerRadius: resolvedCornerRadius, style: .continuous)
                         .fill(uiStyle == .compact ? Color.beansGlassFill.opacity(0.72) : Color.clear)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: resolvedCornerRadius, style: .continuous))
+                        .background(Color.beansGlassFill.opacity(0.86), in: RoundedRectangle(cornerRadius: resolvedCornerRadius, style: .continuous))
                 }
                 .clipShape(RoundedRectangle(cornerRadius: resolvedCornerRadius, style: .continuous))
                 .beansCardShadow(radius: 9, y: 3)
@@ -668,7 +668,7 @@ struct GlassButton: View {
                 } else if isNativeClean {
                     Capsule().fill(Color.primary.opacity(0.055))
                 } else {
-                    Capsule().fill(.thinMaterial)
+                    Capsule().fill(Color.beansGlassFill.opacity(0.72))
                 }
             }
             .overlay {
@@ -937,7 +937,7 @@ struct ToastView: View {
             .padding(.vertical, 10)
             .background {
                 Capsule()
-                    .fill(.ultraThinMaterial)
+                    .fill(Color.beansGlassFill.opacity(0.86))
                     .overlay {
                         Capsule().strokeBorder(.white.opacity(0.18), lineWidth: 0.8)
                     }

@@ -93,7 +93,7 @@ struct ReferencePlaybackView: View {
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.92))
                         .frame(width: 38, height: 38)
-                        .background(.ultraThinMaterial.opacity(0.5), in: Circle())
+                        .background(Color.beansGlassFill.opacity(0.86), in: Circle())
                 }
                 .buttonStyle(GlassPressButtonStyle())
                 .padding(.leading, 16)

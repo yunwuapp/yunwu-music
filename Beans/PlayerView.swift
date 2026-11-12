@@ -2312,7 +2312,7 @@ struct PlayerView: View {
         case .appleMusic:
             if appleLiquid {
                 Circle()
-                    .fill(.ultraThinMaterial)
+                    .fill(Color.beansGlassFill.opacity(0.86))
                     .frame(width: size, height: size)
             } else {
                 Color.clear
@@ -3095,7 +3095,7 @@ struct SeekBar: View {
                         .fill(track.opacity(0.55))
                         .frame(height: 5)
                     Capsule()
-                        .fill(.ultraThinMaterial)
+                        .fill(Color.beansGlassFill.opacity(0.86))
                         .frame(height: 5)
                         .overlay {
                             Capsule().strokeBorder(.white.opacity(0.2), lineWidth: 0.5)
@@ -3607,7 +3607,7 @@ struct LyricsSection: View {
         .padding(.vertical, 9)
         .background {
             Capsule()
-                .fill(.ultraThinMaterial)
+                .fill(Color.beansGlassFill.opacity(0.86))
                 .overlay {
                     Capsule().strokeBorder(.white.opacity(0.18), lineWidth: 0.8)
                 }
@@ -4666,7 +4666,7 @@ private struct PlayerSettingsLiquidGlass<S: Shape>: View {
     var body: some View {
         switch uiStyle {
             case .clear, .liquid:
-                shape.fill(.ultraThinMaterial)
+                shape.fill(Color.beansGlassFill.opacity(0.86))
             case .compact:
                 shape.fill(Color.beansGlassFill.opacity(0.74))
             case .nativeClean:
