@@ -8,8 +8,13 @@ enum PlaybackLiveActivity {
     private static var activity: Activity<BeansPlaybackAttributes>?
 
     static func sync(song: Song?, isPlaying: Bool, progress: Double, duration: Double) {
+        guard UserDefaults.standard.object(forKey: "beans.liveActivity.enabled") as? Bool ?? true else {
+            end()
+            return
+        }
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
-        guard let song else { end(); return }
+        // 暂停即收起：避免 App 被划掉后灵动岛/锁屏还挂着“音乐”
+        guard let song, isPlaying else { end(); return }
 
         let state = BeansPlaybackAttributes.ContentState(
             songTitle: song.name,
@@ -37,6 +42,16 @@ enum PlaybackLiveActivity {
                 )
             } catch {
                 BeansLogger.shared.log("实时活动创建失败：\(error.localizedDescription)", level: .error)
+            }
+        }
+    }
+
+    static func endAll() {
+        guard #available(iOS 16.2, *) else { return }
+        activity = nil
+        Task {
+            for item in Activity<BeansPlaybackAttributes>.activities {
+                await item.end(nil, dismissalPolicy: .immediate)
             }
         }
     }

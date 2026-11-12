@@ -15,6 +15,15 @@ struct BeansApp: App {
     init() {
         // 闪退检测：优先初始化，检测上次异常退出并安装崩溃捕获
         _ = CrashReporter.shared
+        // 冷启动先清掉上一次残留的实时活动，避免被强杀后灵动岛长期挂着
+        if #available(iOS 16.2, *) { PlaybackLiveActivity.endAll() }
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.willTerminateNotification,
+            object: nil,
+            queue: .main
+        ) { _ in
+            if #available(iOS 16.1, *) { PlaybackLiveActivity.end() }
+        }
         // 主页暂停只应在设置页打开期间生效，避免异常退出后把暂停状态永久写入本地。
         UserDefaults.standard.set(false, forKey: "beans.pauseHomeRendering")
         // 新安装默认开启高刷新率；老用户保留自己手动关闭的选择。

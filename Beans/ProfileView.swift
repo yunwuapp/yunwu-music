@@ -997,6 +997,7 @@ struct SettingsView: View {
     @AppStorage("beans.homeGreetingGradientStartHex") private var homeGreetingGradientStartHex = ""
     @AppStorage("beans.homeGreetingGradientEndHex") private var homeGreetingGradientEndHex = ""
     @AppStorage("beans.homeGreetingFont") private var homeGreetingFontName = ""
+    @AppStorage("beans.liveActivity.enabled") private var liveActivityEnabled = true
     @AppStorage("beans.pauseHomeRendering") private var homeRenderingPaused = false
     @AppStorage("beans.homeHideUsername") private var homeHideUsername = false
     @AppStorage("beans.homeHeaderHideSort") private var homeHeaderHideSort = false
@@ -2178,6 +2179,32 @@ struct SettingsView: View {
                 .onAppear {
                     enableHighRefresh = true
                     HighRefreshKeeper.shared.configure(enabled: true)
+                }
+
+                Divider().overlay(Color.beansComment.opacity(0.15))
+
+                Toggle(isOn: $liveActivityEnabled) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "bolt.badge.clock.fill")
+                            .font(.system(size: 14))
+                            .foregroundStyle(Color.beansAmber)
+                            .frame(width: 28)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("灵动岛 / 锁屏实时活动")
+                                .font(BeansFont.appFont(15))
+                                .foregroundStyle(Color.beansLabel)
+                            Text("播放时在灵动岛显示歌曲，点按回到播放页；关闭后不再显示")
+                                .font(BeansFont.appFont(11))
+                                .foregroundStyle(Color.beansComment)
+                        }
+                    }
+                }
+                .toggleStyle(.switch)
+                .tint(Color.beansAmber)
+                .onChange(of: liveActivityEnabled) { value in
+                    if !value, #available(iOS 16.1, *) {
+                        PlaybackLiveActivity.end()
+                    }
                 }
 
                 Divider().overlay(Color.beansComment.opacity(0.15))
