@@ -44,7 +44,13 @@ enum PlaybackLiveActivity {
     static func end() {
         guard let activity else { return }
         self.activity = nil
-        Task { await activity.end(nil, dismissalPolicy: .immediate) }
+        Task {
+            if #available(iOS 16.2, *) {
+                await activity.end(nil, dismissalPolicy: .immediate)
+            } else {
+                await activity.end(nil, dismissalPolicy: .default)
+            }
+        }
     }
 }
 #endif
