@@ -1332,6 +1332,7 @@ struct SettingsView: View {
                 }
                 .beansScrollIndicatorsHidden()
             }
+            .environment(\.beansFlatGlass, true)
             .navigationTitle("设置")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

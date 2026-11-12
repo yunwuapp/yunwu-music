@@ -37,10 +37,9 @@ final class HighRefreshKeeper {
     private func start() {
         guard displayLink == nil else { return }
         let link = CADisplayLink(target: self, selector: #selector(tick))
-        // 最高 120 帧、负载自适应：重毛玻璃页面负载升高时可自动降到 80/60，
-        // 避免为了锁 120 而持续丢帧（锁死 120 在设置页会明显卡顿）。
+        // 全程锁定 120 帧（ProMotion 满血）；页面本身做了降负载处理来保证跟得上
         link.preferredFrameRateRange = CAFrameRateRange(
-            minimum: 60,
+            minimum: 120,
             maximum: 120,
             preferred: 120
         )

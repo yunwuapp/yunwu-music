@@ -149,15 +149,53 @@ struct WallpaperImage: View {
         image.size.width * image.size.height < 480_000
     }
 
+    /// 模糊结果缓存：同一张图 + 同一半径只算一次，之后直接用位图，省掉每帧实时高斯模糊
+    private static let blurCache: NSCache<NSString, UIImage> = {
+        let cache = NSCache<NSString, UIImage>()
+        cache.countLimit = 6
+        return cache
+    }()
+
+    private static func cachedBlur(_ image: UIImage, radius: CGFloat) -> UIImage {
+        let key = "\(UInt(bitPattern: ObjectIdentifier(image)))-\(Int(radius.rounded()))" as NSString
+        if let cached = blurCache.object(forKey: key) { return cached }
+        // 降采样到屏幕级分辨率再模糊，避免对 1600px 原图做全量卷积
+        let scale = min(1, 900 / max(image.size.width, image.size.height))
+        let size = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        let downscaled = renderer.image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }
+        guard let ci = CIImage(image: downscaled)?.clampedToExtent(),
+              let filter = CIFilter(name: "CIGaussianBlur") else { return downscaled }
+        filter.setValue(ci, forKey: kCIInputImageKey)
+        filter.setValue(radius * scale, forKey: kCIInputRadiusKey)
+        guard let output = filter.outputImage?.cropped(to: ci.extent),
+              let cg = CIContext(options: [.useSoftwareRenderer: false]).createCGImage(output, from: output.extent) else {
+            return downscaled
+        }
+        let result = UIImage(cgImage: cg)
+        blurCache.setObject(result, forKey: key)
+        return result
+    }
+
     var body: some View {
         // 用 GeometryReader 明确采用父容器尺寸渲染，图片尺寸/比例与 UI 布局完全隔离
+        let radius = max(Self.isSmall(image) ? 5 : 0, blurRadius)
         GeometryReader { geo in
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFill()
-                .frame(width: geo.size.width, height: geo.size.height)
-                .clipped()
-                .blur(radius: max(Self.isSmall(image) ? 5 : 0, blurRadius))
+            Group {
+                if radius > 0 {
+                    Image(uiImage: Self.cachedBlur(image, radius: radius))
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                }
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
+            .clipped()
         }
         .ignoresSafeArea()
     }
@@ -165,8 +203,21 @@ struct WallpaperImage: View {
 
 // MARK: - 全局容器（跟随全局 UI 样式）
 
+/// 重负载页面（设置页等）可打开此开关，卡片改用预混纯色，省掉每层实时毛玻璃取景
+private struct BeansFlatGlassKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    var beansFlatGlass: Bool {
+        get { self[BeansFlatGlassKey.self] }
+        set { self[BeansFlatGlassKey.self] = newValue }
+    }
+}
+
 struct BeansGlass<S: Shape>: View {
     @AppStorage("beans.uiStyle") private var uiStyleRaw = BeansUIStyle.liquid.rawValue
+    @Environment(\.beansFlatGlass) private var flatGlass
 
     let shape: S
     var forceLiquid = false
@@ -181,8 +232,12 @@ struct BeansGlass<S: Shape>: View {
 
     var body: some View {
         if isLiquid {
-            shape
-                .fill(.ultraThinMaterial)
+            if flatGlass {
+                shape.fill(Color.beansGlassFill.opacity(0.86))
+            } else {
+                shape
+                    .fill(.ultraThinMaterial)
+            }
         } else {
             switch uiStyle {
             case .clear, .liquid:
