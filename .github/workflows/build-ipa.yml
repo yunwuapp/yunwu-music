@@ -5,24 +5,32 @@ on:
 
 jobs:
   build:
-    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-26, macos-15-intel]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Install XcodeGen
-        run: brew install xcodegen
+        run: brew install xcodegen || brew upgrade xcodegen
+
+      - name: Show toolchain
+        run: xcodebuild -version; sw_vers
 
       - name: Generate project
         run: xcodegen generate
 
       - name: Build unsigned
         run: |
+          set -o pipefail
           xcodebuild -project Beans.xcodeproj -scheme Beans \
             -configuration Release -sdk iphoneos \
             -destination 'generic/platform=iOS' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
-            build
+            build 2>&1 | tail -80
 
       - name: Package IPA
         run: |
@@ -34,5 +42,5 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: YunWu-ipa
+          name: YunWu-ipa-${{ matrix.os }}
           path: YunWu.ipa
