@@ -20,9 +20,9 @@ targets:
       - Beans/zh-Hans.lproj
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.yunwu.app
-        MARKETING_VERSION: "1.1.2"
-        CURRENT_PROJECT_VERSION: "13"
+        PRODUCT_BUNDLE_IDENTIFIER: com.cuopai.app
+        MARKETING_VERSION: "1.1.3"
+        CURRENT_PROJECT_VERSION: "14"
         TARGETED_DEVICE_FAMILY: "1"
         SWIFT_OBJC_BRIDGING_HEADER: Beans/Beans-Bridging-Header.h
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -47,7 +47,7 @@ targets:
         NSSupportsLiveActivities: true
         NSSupportsLiveActivitiesFrequentUpdates: true
         CFBundleURLTypes:
-          - CFBundleURLName: com.yunwu.app
+          - CFBundleURLName: com.cuopai.app
             CFBundleURLSchemes: [yunwu]
     dependencies:
       - target: BeansLiveActivity
@@ -62,9 +62,9 @@ targets:
       - Shared
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.yunwu.app.widget
-        MARKETING_VERSION: "1.1.2"
-        CURRENT_PROJECT_VERSION: "13"
+        PRODUCT_BUNDLE_IDENTIFIER: com.cuopai.app.widget
+        MARKETING_VERSION: "1.1.3"
+        CURRENT_PROJECT_VERSION: "14"
         TARGETED_DEVICE_FAMILY: "1"
         SKIP_INSTALL: true
     info:
